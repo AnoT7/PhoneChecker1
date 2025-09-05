@@ -29,11 +29,11 @@
       background:linear-gradient(160deg,var(--bg1),var(--bg2));
       background-attachment:fixed;
       font-family:'Anantason Mon Thin', system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans Thai", sans-serif;
-      -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+      -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; /* anti-copy */
     }
     body::before{
       content:""; position:fixed; inset:0; z-index:-1;
-      background-image:url('assets/bg.png');
+      background-image:url('assets/bg.png'); /* ตรวจชื่อไฟล์ให้ตรง */
       background-size:cover; background-position:center; opacity:.35; filter:blur(2px);
     }
 
@@ -66,7 +66,7 @@
       transition:opacity .35s ease, transform .35s ease; will-change:opacity,transform;
     }
 
-    /* ===== Field: ปุ่มไม่หลุด, input รีไซซ์ถูกต้อง ===== */
+    /* Field */
     .field{ display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
     .field input{
       flex:1 1 auto; min-width:0;
@@ -154,7 +154,6 @@
       .checker{ margin:8px auto !important; padding:8px !important; border-radius:14px !important; }
       .row{ gap:8px !important; }
 
-      /* ปรับ field เป็นคอลัมน์ */
       .field{ flex-wrap:wrap !important; }
       .field input{ flex:1 1 100% !important; }
       .field .btn{ flex:0 0 100% !important; width:100% !important; margin-top:6px !important; }
@@ -194,13 +193,13 @@
       <div class="row">
         <!-- FORM -->
         <div class="form" id="formBox">
-          <label for="model" class="hint" style="display:block;margin-bottom:8px">ชื่อรุ่นมือถือ (เช่น <em>iPhone 16 Pro, Galaxy S24 Ultra, Pixel 8</em>)</label>
+          <label for="model" class="hint" style="display:block;margin-bottom:8px">ชื่อรุ่นมือถือ (เช่น <em>Xiaomi 15 Pro, Galaxy S24 Ultra, Pixel 8</em>)</label>
           <div class="field">
             <input id="model" list="phone-list" name="model" placeholder="พิมพ์ชื่อรุ่นที่นี่..." autocomplete="off" />
             <button class="btn" id="btnCheck">เช็คเลย</button>
           </div>
           <datalist id="phone-list"></datalist>
-          <div class="hint">งานด่วนงานไวพี่เพิ่งว่างมาปั่นมันเลยไม่ค่อยสวย 555555 </div>
+          <div class="hint">ถ้าพิมพ์สั้น ๆ เช่น "15" ระบบจะพยายามเดาเป็น "Xiaomi 15" ให้</div>
         </div>
 
         <!-- RESULT -->
@@ -235,10 +234,14 @@
   </div>
 
   <script>
-    /* Utils */
+    /* ===== Utilities ===== */
     const $ = (sel, root=document) => root.querySelector(sel);
-    const NORMALIZE = s => (s||'').toString().toLowerCase()
-      .replace(/\s+/g,'').replace(/[()\[\]\-_.+]/g,'');
+
+    const normalize = (s) => (s||'')
+      .toString().toLowerCase()
+      .normalize('NFKD')
+      .replace(/\s+/g,'')
+      .replace(/[()\[\]\-_.+\/\\]/g,'');
 
     const rulePass = (mp, video, ois) => {
       const v = (video||'').toUpperCase();
@@ -248,42 +251,82 @@
       return mpOK && videoOK && oisOK;
     };
 
-    /* Dataset */
-    const SOURCES = ['camera_phones_max_2022_2025.json','camera_phones_full_2025.json'];
-    let DATA = [];
+    /* ===== Dataset loading & cleaning ===== */
+    const SOURCES = [
+      'camera_phones_max_2022_2025.json',
+      'camera_phones_full_2025.json'
+    ];
+    let DATA = [];        // cleaned records
+    let INDEX = [];       // for search/datalist
+
+    function makeDisplayName(rec){
+      const brand = rec['แบรนด์'] || rec['Brand'] || '';
+      const model = rec['รุ่น'] || rec['Model'] || '';
+      if(!brand) return model;
+      if(model.toLowerCase().startsWith(brand.toLowerCase())) return model;
+      return `${brand} ${model}`.trim();
+    }
 
     async function loadData(){
-      for (const url of SOURCES){
+      let loaded = [];
+      for(const url of SOURCES){
         try{
-          const res = await fetch(url, {cache:'no-store'});
-          if(!res.ok) continue;
-          const arr = await res.json();
-          if(Array.isArray(arr)) { DATA = arr; break; }
+          const r = await fetch(url, {cache:'no-store'});
+          if(!r.ok) continue;
+          const arr = await r.json();
+          if(Array.isArray(arr)) { loaded = arr; break; }
         }catch(e){ /* try next */ }
       }
-      if(!DATA.length){ console.warn('⚠️ ไม่พบไฟล์ฐานข้อมูล JSON'); }
 
+      // 1) กรอง record ที่ไม่มีชื่อรุ่นทิ้ง
+      DATA = (loaded||[]).filter(rec => (rec && (rec['รุ่น'] || rec['Model'])));
+
+      // 2) ทำดัชนีค้นหา
+      INDEX = DATA.map(rec => {
+        const brand = rec['แบรนด์'] || rec['Brand'] || '';
+        const model = rec['รุ่น'] || rec['Model'] || '';
+        const displayName = makeDisplayName(rec);
+        return {
+          rec,
+          displayName,
+          nModel: normalize(model),
+          nBrandModel: normalize(`${brand} ${model}`)
+        };
+      });
+
+      // 3) เติม datalist เป็น "แบรนด์ + รุ่น"
       const dlist = $('#phone-list');
       const frag = document.createDocumentFragment();
-      DATA.forEach(rec => {
-        const model = rec['รุ่น'] || rec['Model'];
-        if(model){
-          const opt = document.createElement('option');
-          opt.value = model;
-          frag.appendChild(opt);
-        }
+      INDEX.forEach(it => {
+        const opt = document.createElement('option');
+        opt.value = it.displayName;
+        frag.appendChild(opt);
       });
+      dlist.innerHTML = '';
       dlist.appendChild(frag);
     }
 
+    /* ===== Search & Evaluate ===== */
     function findPhone(query){
-      if(!DATA.length) return null;
-      const q = NORMALIZE(query); if(!q) return null;
-      let rec = DATA.find(r => NORMALIZE(r['รุ่น']||r['Model']) === q);
-      if(rec) return rec;
-      rec = DATA.find(r => NORMALIZE(r['รุ่น']||r['Model']).startsWith(q));
-      if(rec) return rec;
-      return DATA.find(r => NORMALIZE(r['รุ่น']||r['Model']).includes(q)) || null;
+      if(!INDEX.length) return null;
+      const q = normalize(query);
+      if(!q) return null;
+
+      // exact รุ่น
+      let hit = INDEX.find(it => it.nModel === q);
+      if(hit) return hit.rec;
+
+      // exact แบรนด์+รุ่น
+      hit = INDEX.find(it => it.nBrandModel === q);
+      if(hit) return hit.rec;
+
+      // startsWith/includes รุ่น
+      hit = INDEX.find(it => it.nModel.startsWith(q)) || INDEX.find(it => it.nModel.includes(q));
+      if(hit) return hit.rec;
+
+      // startsWith/includes แบรนด์+รุ่น
+      hit = INDEX.find(it => it.nBrandModel.startsWith(q)) || INDEX.find(it => it.nBrandModel.includes(q));
+      return hit ? hit.rec : null;
     }
 
     function computePass(rec){
@@ -295,6 +338,11 @@
       return rulePass(mp, video, ois);
     }
 
+    function displayNameOf(rec, fallback=''){
+      return makeDisplayName(rec) || fallback;
+    }
+
+    /* ===== UI ===== */
     function showBadge(pass){
       const badge = $('#badge');
       if(pass){
@@ -330,13 +378,14 @@
       const formBox = $('#formBox');
       const q = $('#model').value.trim();
       const found = findPhone(q);
-      const modelName = found ? (found['รุ่น'] || found['Model'] || q) : q;
+      const modelName = found ? displayNameOf(found, q) : q;
       const pass = found ? computePass(found) : false;
 
       formBox.classList.add('fade-out');
       setTimeout(()=>{ showResult(pass, modelName); }, 360);
     }
 
+    /* ===== Init ===== */
     window.addEventListener('DOMContentLoaded', async ()=>{
       await loadData();
       $('#btnCheck').addEventListener('click', runCheck);
