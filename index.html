@@ -211,7 +211,7 @@
           <p class="result-text" id="resultText">ผลจะปรากฏหลังจากกดเช็ค</p>
           <div class="cta">
             <a class="btn apply" id="applyBtn" href="https://docs.google.com/forms/d/e/1FAIpQLSdteJLh6lsSFKmmOrIRtTQsODhvXHQVZC0kffW5q7i7CC9iSg/viewform" target="_blank" rel="noopener">สมัครเลยที่นี่</a>
-            <button class="how" onclick="alert('เกณฑ์เบื้องต้น:\\n• กล้องหลัก ≥ 48MP\\n• วิดีโอ ≥ 4K60 (หรือมี 8K)\\n• มี OIS (กันสั่น)')">สมัครยังไง?</button>
+            <button class="how" onclick="alert('ถ้าน้องใจถึง พี่ก็ใจถึง')">สมัครยังไง?</button>
           </div>
         </div>
       </div>
@@ -330,7 +330,7 @@
     }
 
     function computePass(rec){
-      const key = 'ผ่านเกณฑ์ชมรม (ค่าเริ่มต้น)';
+      const key = 'ผ่านเกณฑ์ที่ตั้ง (ค่าเริ่มต้น)';
       if(Object.prototype.hasOwnProperty.call(rec, key)) return !!rec[key];
       const mp = rec['กล้องหลัก (MP)'] || rec['Main_MP'];
       const video = rec['วิดีโอสูงสุด'] || rec['Video_Max'];
