@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -15,30 +14,26 @@
       font-display: swap;
     }
     :root{
-      --bg1:#ffb699; /* gradient start */
-      --bg2:#f39aa2; /* gradient end   */
+      --bg1:#ffb699; --bg2:#f39aa2;
       --glass: rgba(255,255,255,.16);
       --glass-2: rgba(255,255,255,.25);
-      --ink: #2b2b2b;
-      --ink-dim: rgba(0,0,0,.65);
-      --ok: #28c76f;    /* pass */
-      --ng: #ff4d4f;    /* fail */
-      --pill: rgba(255,255,255,.5);
-      --pill-active: rgba(255,255,255,.85);
-      --btn: #f2c4b2;
-      --btn-text: #5b3b32;
-      --soft: rgba(0,0,0,.08);
+      --ink:#2b2b2b; --ink-dim: rgba(0,0,0,.65);
+      --ok:#28c76f; --ng:#ff4d4f;
+      --pill: rgba(255,255,255,.5); --pill-active: rgba(255,255,255,.85);
+      --btn:#f2c4b2; --btn-text:#5b3b32; --soft: rgba(0,0,0,.08);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; color:var(--ink); background: linear-gradient(160deg,var(--bg1),var(--bg2));
+      margin:0; color:var(--ink);
+      background: linear-gradient(160deg,var(--bg1),var(--bg2));
       background-attachment: fixed; 
       font-family: 'Anantason Mon Thin', system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans Thai", sans-serif;
+      -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; /* anti-copy */
     }
-    body::before{ /* background image overlay */
+    body::before{
       content:""; position:fixed; inset:0; z-index:-1;
-      background-image:url('assets/bg.png');
+      background-image:url('assets/bg.png'); /* ใช้ภาพที่คุณให้มา */
       background-size:cover; background-position:center; opacity:.35; filter: blur(2px);
     }
 
@@ -50,24 +45,10 @@
       padding:10px 14px; border-radius:999px; backdrop-filter:saturate(1.2) blur(8px);
       background:var(--pill); border:1px solid var(--glass-2);
       color:#6e534b; letter-spacing:.2px; font-size:14px;
+      text-decoration:none; display:inline-block;
     }
     .step-chip.active{ background:var(--pill-active); color:#3b2b27 }
-    .step-chip {
-  padding:10px 14px;
-  border-radius:999px;
-  backdrop-filter:saturate(1.2) blur(8px);
-  background:var(--pill);
-  border:1px solid var(--glass-2);
-  color:#6e534b;
-  letter-spacing:.2px;
-  font-size:14px;
-  text-decoration: none; /* <<< ตัดเส้นขีดออก */
-  display:inline-block;  /* <<< ให้ดูเป็นปุ่มแท้ ๆ */
-}
-.step-chip:hover {
-  background: var(--pill-active);
-  color:#3b2b27;
-}
+    .step-chip:hover{ background:var(--pill-active); color:#3b2b27; }
 
     .hero{ text-align:center; margin: 18px auto 12px }
     .hero h1{ font-size: clamp(26px, 3.2vw, 40px); margin:12px 0 6px }
@@ -78,31 +59,34 @@
       border:1px solid var(--glass-2); border-radius: 20px; padding: 14px; box-shadow: 0 12px 30px rgba(0,0,0,.12); overflow:hidden
     }
     .row{ display:grid; grid-template-columns: 1fr; gap:14px }
-    @media (max-width:600px){
-  .phone-box { margin: 10px auto 4px }
-  .card { padding: 16px }
-}
-
 
     .form{
       background: rgba(255,255,255,.55); border-radius:16px; padding:16px; border:1px solid rgba(255,255,255,.6);
       transition: opacity .35s ease, transform .35s ease; will-change: opacity, transform;
     }
 
-    .field{ display:flex; gap:8px; align-items:center; }
+    /* <== ตรงนี้แก้ให้ปุ่มไม่หลุดบรรทัดและเวิร์กทุกจอ */
+    .field{
+      display:flex; align-items:center; gap:8px; flex-wrap:nowrap;
+    }
     .field input{
-      flex:1; padding:14px 14px; border-radius:12px; border:1px solid var(--soft);
+      flex:1 1 auto; min-width:0;
+      padding:14px 14px; border-radius:12px; border:1px solid var(--soft);
       outline:none; background:#fff; font-size:16px;
     }
-    .btn{ appearance:none; border:0; border-radius:999px; padding:12px 18px; font-weight:700; cursor:pointer;
+    .field .btn{ flex:0 0 auto; white-space:nowrap; }
+
+    .btn{
+      appearance:none; border:0; border-radius:999px; padding:12px 18px; font-weight:700; cursor:pointer;
       background:var(--btn); color:var(--btn-text); box-shadow: 0 6px 16px rgba(0,0,0,.12);
+      text-decoration:none; display:inline-block;
     }
     .btn:disabled{ opacity:.6; cursor:not-allowed }
 
     .hint{ font-size:12px; color:var(--ink-dim); margin-top:6px }
     .hint a{ color:#3b2b27 }
 
-    /* Result card (hidden until check) */
+    /* Result card */
     .card{
       background: rgba(255,255,255,.65); border-radius:18px; padding:22px; text-align:center;
       border:1px solid rgba(255,255,255,.75);
@@ -113,7 +97,7 @@
     .phone-box{ position:relative; width:min(280px, 80%); margin:16px auto 8px }
     .phone{ width:100%; display:block; filter: drop-shadow(0 10px 22px rgba(0,0,0,.18)); }
 
-    /* New 3D badge (not flat) */
+    /* Badge 3D */
     .badge{ position:absolute; right:-14px; top:-14px; width:clamp(64px,7vw,88px); aspect-ratio:1/1; border-radius:999px;
       display:grid; place-items:center; box-shadow: inset 0 3px 8px rgba(255,255,255,.35), inset 0 -8px 16px rgba(0,0,0,.28), 0 10px 24px rgba(0,0,0,.28);
       border:2px solid rgba(255,255,255,.55); overflow:hidden; transform: translateZ(0) scale(.92); transition: transform .28s ease }
@@ -121,17 +105,16 @@
     .badge svg{ width:58%; height:58%; filter: drop-shadow(0 1px 0 rgba(0,0,0,.25)) }
 
     .result-text{ font-size: clamp(15px, 1.8vw, 18px); margin:10px auto 18px; }
+    [data-status="pass"] .result-text{ color: var(--ok) }
+    [data-status="fail"] .result-text{ color: var(--ng) }
 
     .cta{ display:flex; flex-direction:column; align-items:center; gap:6px }
     .cta .apply{ min-width: 260px; }
     .cta .how{ font-size:12px; text-decoration:underline; color:rgba(0,0,0,.6); background:none; border:0; cursor:pointer }
 
-    [data-status="pass"] .result-text{ color: var(--ok) }
-    [data-status="fail"] .result-text{ color: var(--ng) }
-
     .fade-out{ opacity:0 !important; transform: translateY(8px) !important; pointer-events:none }
 
-    /* Requirements section */
+    /* Requirements */
     .req{ margin: 26px auto 0; background: rgba(255,255,255,.45); border:1px solid var(--glass-2);
       border-radius: 16px; padding: 18px }
     .req h2{ margin:0 0 10px; font-size: clamp(18px, 2.6vw, 26px) }
@@ -139,34 +122,61 @@
     .req li{ margin:6px 0; color:var(--ink-dim); }
 
     footer{ text-align:center; margin-top: 24px; font-size:12px; color:rgba(0,0,0,.55) }
-  </style>
-  <style>
-  /* กันคลิกขวา + เลือกข้อความ */
-  body {
-    -webkit-user-select: none; /* Chrome/Safari */
-    -moz-user-select: none;    /* Firefox */
-    -ms-user-select: none;     /* IE/Edge */
-    user-select: none;         /* มาตรฐาน */
-  }
-</style>
-<script>
-  // ปิดคลิกขวา
-  document.addEventListener('contextmenu', e => e.preventDefault());
-  // ปิด Ctrl+C / Ctrl+U
-  document.addEventListener('keydown', e => {
-    if ((e.ctrlKey && (e.key === 'c' || e.key === 'u')) || e.key === 'PrintScreen') {
-      e.preventDefault();
-      alert('❌ ไม่อนุญาตให้คัดลอกข้อความ');
-    }
-  });
-</script>
 
+    /* ===== Mobile tighten ===== */
+    @media (max-width: 600px){
+      .hero{ margin:10px auto 4px !important; }
+      .wrap{ padding-bottom:48px !important; }
+      .checker{ margin:12px auto !important; padding:10px !important; }
+      .row{ grid-template-columns:1fr !important; align-items:start !important; }
+
+      #formBox{ padding:12px !important; }
+      .field input{ padding:12px 12px !important; font-size:15px !important; }
+      .btn{ padding:10px 16px !important; }
+
+      .card{ padding:14px !important; border-radius:14px !important; }
+      .phone-box{ width:min(210px,70vw) !important; margin:6px auto 6px !important; }
+      .badge{ right:-6px !important; top:-6px !important; width:54px !important; aspect-ratio:1/1 !important; }
+
+      .result-text{
+        font-size:16px !important; line-height:1.35 !important;
+        margin:6px auto 12px !important; font-weight:700 !important; text-shadow:0 1px 2px rgba(0,0,0,.12);
+      }
+      .cta{ gap:4px !important; }
+      .cta .apply{ min-width:200px !important; padding:10px 14px !important; }
+    }
+
+    /* ===== Ultra-small phones fix (<360px) ===== */
+    @media (max-width: 359px){
+      .wrap{ padding:12px 10px 28px !important; }
+      .checker{ margin:8px auto !important; padding:8px !important; border-radius:14px !important; }
+      .row{ gap:8px !important; }
+      .field{ flex-wrap:wrap !important; }
+      .field input{ flex:1 1 100% !important; }
+      .field .btn{ flex:0 0 100% !important; width:100% !important; margin-top:6px !important; }
+      .card{ padding:12px !important; border-radius:12px !important; max-width:100% !important; }
+      .phone-box{ width:min(180px,82vw) !important; margin:4px auto !important; }
+      .badge{ right:-4px !important; top:-4px !important; width:46px !important; }
+      .result-text{ font-size:15px !important; margin:6px 0 10px !important; }
+      .cta .apply{ min-width:100% !important; padding:10px 12px !important; }
+    }
+  </style>
+
+  <!-- Anti-copy keys -->
+  <script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey && (e.key === 'c' || e.key === 'u')) || e.key === 'PrintScreen') {
+        e.preventDefault();
+        alert('❌ ไม่อนุญาตให้คัดลอกข้อความ');
+      }
+    });
+  </script>
 </head>
 <body>
   <div class="wrap">
     <nav class="steps" aria-label="ขั้นตอน">
       <div class="step-chip active">✍️ กรอกสมาร์ทโฟน</div>
-     
       <a class="step-chip" href="https://docs.google.com/forms/d/e/1FAIpQLSdteJLh6lsSFKmmOrIRtTQsODhvXHQVZC0kffW5q7i7CC9iSg/viewform" target="_blank" rel="noopener">📩 สมัครเข้าร่วม</a>
     </nav>
 
@@ -177,7 +187,7 @@
 
     <section class="checker" id="checker">
       <div class="row">
-        <!-- LEFT: FORM -->
+        <!-- FORM -->
         <div class="form" id="formBox">
           <label for="model" class="hint" style="display:block;margin-bottom:8px">ชื่อรุ่นมือถือ (เช่น <em>iPhone 16 Pro, Galaxy S24 Ultra, Pixel 8</em>)</label>
           <div class="field">
@@ -188,7 +198,7 @@
           <div class="hint">งานด่วนงานไวพี่เพิ่งว่างมาปั่นมันเลยไม่ค่อยสวย 555555 </div>
         </div>
 
-        <!-- RIGHT: RESULT CARD (hidden until check) -->
+        <!-- RESULT -->
         <div class="card" id="resultCard" data-status="fail" aria-live="polite" aria-hidden="true">
           <div class="phone-box">
             <img class="phone" src="assets/phone.png" alt="ภาพโทรศัพท์" />
@@ -203,7 +213,7 @@
       </div>
     </section>
 
-    <!-- Requirements on the same page -->
+    <!-- Requirements -->
     <section class="req" id="req">
       <h2>คุณสมบัติที่ต้องมี</h2>
       <ul>
@@ -220,12 +230,10 @@
   </div>
 
   <script>
-    // -------------------- Utils --------------------
+    /* Utils */
     const $ = (sel, root=document) => root.querySelector(sel);
-
     const NORMALIZE = s => (s||'').toString().toLowerCase()
-      .replace(/\s+/g,'')
-      .replace(/[()\[\]\-_.+]/g,'');
+      .replace(/\s+/g,'').replace(/[()\[\]\-_.+]/g,'');
 
     const rulePass = (mp, video, ois) => {
       const v = (video||'').toUpperCase();
@@ -235,11 +243,8 @@
       return mpOK && videoOK && oisOK;
     };
 
-    // -------------------- Load Dataset --------------------
-    const SOURCES = [
-      'camera_phones_max_2022_2025.json',
-      'camera_phones_full_2025.json'
-    ];
+    /* Dataset */
+    const SOURCES = ['camera_phones_max_2022_2025.json','camera_phones_full_2025.json'];
     let DATA = [];
 
     async function loadData(){
@@ -253,18 +258,20 @@
       }
       if(!DATA.length){ console.warn('⚠️ ไม่พบไฟล์ฐานข้อมูล JSON'); }
 
-      // Build datalist only (no suggest buttons)
       const dlist = $('#phone-list');
       const frag = document.createDocumentFragment();
       DATA.forEach(rec => {
         const model = rec['รุ่น'] || rec['Model'];
-        const opt = document.createElement('option');
-        opt.value = model; frag.appendChild(opt);
+        if(model){
+          const opt = document.createElement('option');
+          opt.value = model;
+          frag.appendChild(opt);
+        }
       });
       dlist.appendChild(frag);
     }
 
-    // -------------------- Find & Check --------------------
+    /* Search */
     function findPhone(query){
       if(!DATA.length) return null;
       const q = NORMALIZE(query);
@@ -273,8 +280,7 @@
       if(rec) return rec;
       rec = DATA.find(r => NORMALIZE(r['รุ่น']||r['Model']).startsWith(q));
       if(rec) return rec;
-      rec = DATA.find(r => NORMALIZE(r['รุ่น']||r['Model']).includes(q));
-      return rec || null;
+      return DATA.find(r => NORMALIZE(r['รุ่น']||r['Model']).includes(q)) || null;
     }
 
     function computePass(rec){
@@ -286,6 +292,7 @@
       return rulePass(mp, video, ois);
     }
 
+    /* UI */
     function showBadge(pass){
       const badge = $('#badge');
       if(pass){
@@ -302,15 +309,15 @@
       badge.classList.remove('pop'); requestAnimationFrame(()=>badge.classList.add('pop'));
     }
 
-    function showResult(pass){
+    function showResult(pass, modelName){
       const card = $('#resultCard');
       const txt  = $('#resultText');
       if(pass){
         card.setAttribute('data-status','pass');
-        txt.textContent = 'ยินดีด้วย โทรศัพท์ของคุณผ่านเกณฑ์เข้าร่วมสมาชิก';
+        txt.textContent = `ยินดีด้วย! ${modelName} ของคุณผ่านเกณฑ์เข้าร่วมสมาชิก`;
       }else{
         card.setAttribute('data-status','fail');
-        txt.textContent = 'เสียใจด้วย โทรศัพท์ของคุณไม่ผ่านเกณฑ์เข้าร่วมสมาชิก';
+        txt.textContent = `เสียใจด้วย... ${modelName} ของคุณไม่ผ่านเกณฑ์เข้าร่วมสมาชิก`;
       }
       showBadge(pass);
       card.classList.add('is-visible');
@@ -321,13 +328,14 @@
       const formBox = $('#formBox');
       const q = $('#model').value.trim();
       const found = findPhone(q);
+      const modelName = found ? (found['รุ่น'] || found['Model'] || q) : q;
       const pass = found ? computePass(found) : false;
-      // fade out form then show result
+
       formBox.classList.add('fade-out');
-      setTimeout(()=>{ showResult(pass); }, 360);
+      setTimeout(()=>{ showResult(pass, modelName); }, 360);
     }
 
-    // -------------------- Events --------------------
+    /* Init */
     window.addEventListener('DOMContentLoaded', async ()=>{
       await loadData();
       $('#btnCheck').addEventListener('click', runCheck);
